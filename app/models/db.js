@@ -1,5 +1,6 @@
 import mysql from 'mysql2';
 import dotenv from 'dotenv';
+import logger from '/Users/rimadagher/Documents/JohnAbbott-FSD/Web_Services_2024/day02todos/app/utils/logger.js';
 
 dotenv.config(); // Load .env variables
 
@@ -12,10 +13,10 @@ const db = mysql.createConnection({
 
 db.connect((err) => {
   if (err) {
-    console.error('Database connection failed:', err.message);
+    logger.error('Database connection failed:', err.message);
     process.exit(1); // Exit if database connection fails
   } else {
-    console.log('Connected to MySQL database.');
+    logger.info('Connected to MySQL database.');
   }
 });
 
