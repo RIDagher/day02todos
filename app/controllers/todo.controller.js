@@ -91,7 +91,13 @@ export const updateTodo = (req, res) => {
     return res.status(400).json({ message: validationError });
   }
 
-  Todo.updateById(id, req.body, (err, data) => {
+  const updatedTodo = {
+    task: req.body.task,
+    dueDate: req.body.dueDate,
+    isDone: req.body.isDone || 'Pending',
+  };
+
+  Todo.updateById(id, updateTodo, (err, data) => {
     if (err) {
       if (err.kind === 'not_found') {
         logger.warn(`Todo with ID ${id} not found for update`);

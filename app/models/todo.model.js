@@ -1,10 +1,11 @@
 import db from './db.js';
 import logger from '../utils/logger.js';
+import moment from 'moment';
 
 // Constructor function
 const Todo = function (todo) {
   this.task = todo.task;
-  this.dueDate = todo.dueDate;
+  this.dueDate = moment(todo.dueDate, 'YYYY-MM-DD').format('YYYY-MM-DD'); // Ensure format
   this.isDone = todo.isDone;
 };
 
@@ -15,9 +16,14 @@ Todo.getAll = (result) => {
       logger.error(`Database error: ${err.message}`);
       return result(err, null);
     }
+    // Format dueDate before sending response
+    const formattedTodos = res.map((todo) => ({
+      ...todo,
+      dueDate: moment(todo.dueDate, 'YYYY-MM-DD').format('YYYY-MM-DD'),
+    }));
 
-    logger.info(`Fetched ${res.length} todos from DB`);
-    result(null, res);
+    logger.info(`Fetched ${formattedTodos.length} todos from DB`);
+    result(null, formattedTodos);
   });
 };
 
@@ -26,12 +32,17 @@ Todo.getTodoById = (id, result) => {
   db.query('SELECT * FROM todos WHERE id = ?', [id], (err, res) => {
     if (err) {
       logger.error(`Database error: ${err.message}`);
-      return result(err, null); // ⬅️ FIX: Added return to prevent execution from continuing
+      return result(err, null);
     }
+
     if (res.length) {
+      res[0].dueDate = moment(res[0].dueDate, 'YYYY-MM-DD').format(
+        'YYYY-MM-DD'
+      ); // Ensure correct format
       logger.info(`Todo found: ${JSON.stringify(res[0])}`);
-      return result(null, res[0]);
+      return result(null, res[0]); // Return single object
     }
+
     logger.warn(`Todo with ID ${id} not found`);
     return result({ kind: 'not_found' }, null);
   });
